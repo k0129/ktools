@@ -62,12 +62,6 @@ install_packages() {
 
 echo "Welcome to the ktools install wizard!"
 echo "Installation log files are written to /etc/ktools/ktools.log"
-echo "Please only install and configure tools and packages if you know how they work and how they affect your system."
-echo "It is recommended that you inspect the code of all tools prior to installation."
-echo
-echo -e "\033[1;33mWARNING: misconfiguring ktools can cause broken firewalls. Many system changes may be difficult to revert\033[0m"
-echo
-echo "Only install features you intend to use. Some features use nftables as the firewall, which breaks uncomplicated firewall (ufw)."
 read -p "Press enter to acknowledge and continue with installation. Press CTRL+C at any time to exit."
 clear
 
@@ -103,6 +97,8 @@ log() {
 }
 
 clear
+
+echo "Using: <$PKG_MGR>. Press CTRL+C if this is not correct"
 
 if confirm "Update/upgrade package lists? (may take a while and require reboot)"; then
   update_system
@@ -195,9 +191,9 @@ EOF
   echo "Please review /etc/audit/audit.rules and customize as needed for your environment."
   read -r -p "Press enter to acknowledge"
   log "Installed and configured auditd with default rules"
-  clear
+  
 fi
-clear
+echo "\n\n"
 
 if confirm "Install python?"; then
   if [ "$PKG_MGR" = "apt" ]; then
@@ -208,111 +204,10 @@ if confirm "Install python?"; then
       install_packages python3 python-pip
     fi
   fi
-  clear
-  if confirm "Install dependencies for ip list syncing?"; then
-    pip3 install paho-mqtt
-  fi
-  clear
-  log "Installed python3 and python packages: pip3, paho-mqtt"
+  log "Installed python3 and python packages: pip3"
 fi
-clear
-
-echo "Install and configure ip lists and related custom tools/scripts?"
-echo -e "\033[1;33mWARNING: This uses nftables and is not compatible with uncomplicated firewall (ufw)\033[0m"
-if confirm "Continue?"; then
-  install_packages nftables
-
-  nft add table inet filter
-
-  nft add set inet filter blacklist '{ type ipv4_addr; flags interval; }'
-  nft add set inet filter whitelist '{ type ipv4_addr; flags interval; }'
-
-  systemctl enable nftables
-  systemctl start nftables
-
-  install_packages mosquitto-clients
-
-  cp ./blacklist.sh /bin/blacklist
-  cp ./unblacklist.sh /bin/unblacklist
-  cp ./whitelist.sh /bin/whitelist
-  cp ./unwhitelist.sh /bin/unwhitelist
-  chmod +x /bin/blacklist
-  chmod +x /bin/unblacklist
-  chmod +x /bin/whitelist
-  chmod +x /bin/unwhitelist
-  log "Installed ipset and custom ipset scripts"
-  clear
-
-  echo "Would you like to install mqtt server for ip list syncing?"
-  echo -e "\033[1;33mWARNING: Only install on one machine\033[0m"
-  if confirm "Continue?"; then
-    install_packages mosquitto
-
-    cat > "/etc/mosquitto/mosquitto.conf" <<EOF
-# Listen on secure port
-listener 8883
-
-# TLS encryption
-cafile /etc/mosquitto/certs/ca.crt
-certfile /etc/mosquitto/certs/server.crt
-keyfile /etc/mosquitto/certs/server.key
-
-# Require clients to authenticate with certs (mTLS)
-require_certificate false
-
-# Only allow encrypted connections
-allow_anonymous false
-password_file /etc/mosquitto/passwd
-EOF
-
-    cat > "/etc/mosquitto/aclfile" <<EOF
-user mosquitto-client
-topic readwrite #
-EOF
-    read -p "At the next prompt, enter 'evening-conveyance-bill'. Press enter to continue"
-    mosquitto_passwd /etc/mosquitto/passwd mosquitto-client
-
-    mkdir -p /etc/mosquitto/certs
-    cp ./ca.crt /etc/mosquitto/certs/ca.crt
-    cp ./server.crt /etc/mosquitto/certs/server.crt
-    cp ./server.key /etc/mosquitto/certs/server.key
-    chmod 600 /etc/mosquitto/certs/server.key
-    chown mosquitto: /etc/mosquitto/certs/server.key
-    chmod 600 /etc/mosquitto/certs/server.crt
-    chown mosquitto: /etc/mosquitto/certs/server.crt
-    chmod 644 /etc/mosquitto/certs/ca.crt
-    chown mosquitto: /etc/mosquitto/certs/ca.crt
-
-    systemctl restart mosquitto
-    log "Installed and configured mosquitto"
-    clear
-  fi
-  clear
-
-  echo "Install mosquitto client files?"
-  echo -e "\033[1;33mWARNING: installing client modifies firewall rules\033[0m"
-  echo -e "\033[1;33mWARNING: installing client requires python and ipset dependencies\033[0m"
-  echo -e "\033[1;33mWARNING: client uses nftables and does not integrate with universal firewall (ufw)\033[0m"
-  if confirm "Continue?"; then
-    cp ./ca.crt /etc/ktools/ca.crt
-    clear
-    read -p "Enter ip of mqtt server or localhost if server is installed here: " mqtt_ip
-    echo "mqtt_ip=$mqtt_ip" > /etc/ktools/ktools.conf
-    clear
-    cp ./ipsetsync.py /etc/ktools/ipsetsync.py
-    cp ./ipsetsyncd.service /etc/systemd/system/ipsetsyncd.service
-    systemctl daemon-reload
-    systemctl enable ipsetsyncd.service
-    systemctl start ipsetsyncd.service
-    log "Installed mosquitto client data including ipsetsyncd.service"
-    clear
-  fi
-fi
-
-clear
+echo "\n\n"
 echo -e "\033[1;33mWARNING: some services may require further configuration\033[0m"
 echo -e "\033[1;33mWARNING: a reboot may be required to finalize some changes. A reboot can be triggered with 'sudo shutdown -r now'\033[0m"
-echo -e "\033[1;33mWARNING: test all installed features immediately or directly after optional reboot\033[0m"
 echo "ktools done."
 exit 0
-
