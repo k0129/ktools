@@ -232,14 +232,14 @@ if confirm "Continue?"; then
 
   install_packages mosquitto-clients
 
-  cp ./blacklist.sh /usr/local/bin/blacklist
-  cp ./unblacklist.sh /usr/local/bin/unblacklist
-  cp ./whitelist.sh /usr/local/bin/whitelist
-  cp ./unwhitelist.sh /usr/local/bin/unwhitelist
-  chmod +x /usr/local/bin/blacklist
-  chmod +x /usr/local/bin/unblacklist
-  chmod +x /usr/local/bin/whitelist
-  chmod +x /usr/local/bin/unwhitelist
+  cp ./blacklist.sh /bin/blacklist
+  cp ./unblacklist.sh /bin/unblacklist
+  cp ./whitelist.sh /bin/whitelist
+  cp ./unwhitelist.sh /bin/unwhitelist
+  chmod +x /bin/blacklist
+  chmod +x /bin/unblacklist
+  chmod +x /bin/whitelist
+  chmod +x /bin/unwhitelist
   log "Installed ipset and custom ipset scripts"
   clear
 
