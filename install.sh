@@ -224,8 +224,8 @@ if confirm "Continue?"; then
 
   nft add table inet filter
 
-  nrf add set inet filter blacklist '{ type ipv4_addr; flags interval; }'
-  nrf add set inet filter whitelist '{ type ipv4_addr; flags interval; }'
+  nft add set inet filter blacklist '{ type ipv4_addr; flags interval; }'
+  nft add set inet filter whitelist '{ type ipv4_addr; flags interval; }'
 
   systemctl enable nftables
   systemctl start nftables
@@ -258,17 +258,19 @@ certfile /etc/mosquitto/certs/server.crt
 keyfile /etc/mosquitto/certs/server.key
 
 # Require clients to authenticate with certs (mTLS)
-require_certificate true
-use_identity_as_username true
+require_certificate false
 
 # Only allow encrypted connections
 allow_anonymous false
+password_file /etc/mosquitto/passwd
 EOF
 
     cat > "/etc/mosquitto/aclfile" <<EOF
 user mosquitto-client
 topic readwrite #
 EOF
+    read -p "At the next prompt, enter 'evening-conveyance-bill'. Press enter to continue"
+    mosquitto_passwd /etc/mosquitto/passwd mosquitto-client
 
     mkdir -p /etc/mosquitto/certs
     cp ./ca.crt /etc/mosquitto/certs/ca.crt
@@ -278,7 +280,7 @@ EOF
     chown mosquitto: /etc/mosquitto/certs/server.key
     chmod 600 /etc/mosquitto/certs/server.crt
     chown mosquitto: /etc/mosquitto/certs/server.crt
-    chmod 600 /etc/mosquitto/certs/ca.crt
+    chmod 644 /etc/mosquitto/certs/ca.crt
     chown mosquitto: /etc/mosquitto/certs/ca.crt
 
     systemctl restart mosquitto
@@ -293,11 +295,6 @@ EOF
   echo -e "\033[1;33mWARNING: client uses nftables and does not integrate with universal firewall (ufw)\033[0m"
   if confirm "Continue?"; then
     cp ./ca.crt /etc/ktools/ca.crt
-    cp ./client.key /etc/ktools/client.key
-    cp ./server.crt /etc/ktools/client.crt
-    chmod 600 /etc/ktools/ca.crt
-    chmod 600 /etc/ktools/client.key
-    chmod 600 /etc/ktools/client.crt
     clear
     read -p "Enter ip of mqtt server or localhost if server is installed here: " mqtt_ip
     echo "mqtt_ip=$mqtt_ip" > /etc/ktools/ktools.conf
@@ -318,3 +315,4 @@ echo -e "\033[1;33mWARNING: a reboot may be required to finalize some changes. A
 echo -e "\033[1;33mWARNING: test all installed features immediately or directly after optional reboot\033[0m"
 echo "ktools done."
 exit 0
+
