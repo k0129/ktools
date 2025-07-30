@@ -32,6 +32,6 @@ sudo blacklist <ip>
 ---
 
 ## Additional tools
-Additional scripts are packaged
+Additional scripts are packaged in addtl
 - `auditd-install.sh` installs auditd and configures some default rules
 - `firewall-example` creates an example firewall config with lots of rules. It's designed so you only need to trim rules you don't need instead of adding rules you do need.
