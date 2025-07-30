@@ -26,6 +26,7 @@ sudo blacklist <ip>
 
 1. Download the repository.
 2. Make tools executable (`chmod +x`)
+3. Run!
 
 > **Note:** If you're downloading via `curl`, be sure to use the `-L` flag to follow redirects.
 
