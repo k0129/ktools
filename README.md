@@ -2,8 +2,10 @@ ktools is a suite of tools to manage ip blacklists and whitelists across compute
 
 Components:
 Mosquitto server: and MQTT broker that facilitates ip syncing
-ipsyncd: daemon that handles updates
+ipsyncd: daemon that handles ip updates
+
 tools: adds commands: blacklist, unblacklist, whitelist, unwhitelist to /bin
+
 usage: sudo blacklist <ip> [--noupdate]
 
 Install by downloading the code, making install.sh executable with 'sudo chmod +x install.sh' then running 'sudo ./install.sh'
