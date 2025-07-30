@@ -65,29 +65,6 @@ echo "Installation log files are written to /etc/ktools/ktools.log"
 read -p "Press enter to acknowledge and continue with installation. Press CTRL+C at any time to exit."
 clear
 
-ktools_zip="./ktools.zip"
-
-if [ ! -f "$ktools_zip" ]; then
-  echo "ERROR: File '$ktools_zip' not found in the active directory."
-  exit 1
-fi
-
-unzip_dir="/tmp/ktools_install_$$"
-mkdir -p "$unzip_dir"
-cleanup() {
-  rm -rf "$unzip_dir"
-}
-trap cleanup EXIT
-
-echo "Unzipping '$ktools_zip' to '$unzip_dir'..."
-unzip -q "$ktools_zip" -d "$unzip_dir"
-if [ $? -ne 0 ]; then
-  echo "Failed to unzip $ktools_zip"
-  exit 1
-fi
-
-cd "$unzip_dir/ktools" || { echo "Could not find extracted 'ktools' directory"; exit 1; }
-
 mkdir -p /etc/ktools
 touch /etc/ktools/ktools.conf
 touch /etc/ktools/ktools.log
