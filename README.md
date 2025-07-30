@@ -1,6 +1,6 @@
 # ktools
 
-**ktools** is a suite of tools designed to manage IP blacklists and whitelists across multiple computers. It also integrates with `auditd` for system auditing.
+**ktools** is a suite of tools designed to manage IP blacklists and whitelists across multiple computers. It also installs `auditd` for system auditing.
 
 ---
 
