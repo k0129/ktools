@@ -9,7 +9,7 @@
 - **Mosquitto server**  
   An MQTT broker that facilitates IP synchronization between systems.
 
-- **ipsyncd**  
+- **ipsetsyncd**  
   A daemon that handles IP updates automatically.
 
 - **tools**  
