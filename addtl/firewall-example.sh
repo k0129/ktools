@@ -93,7 +93,7 @@ table inet filter {
         type filter hook output priority 0
         policy accept
 
-        ip daddr @blacklist drop
+        ip daddr @blacklist reject
     }
 
     chain forward {
